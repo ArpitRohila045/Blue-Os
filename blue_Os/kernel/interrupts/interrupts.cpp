@@ -7,6 +7,7 @@ InterruptHandler::InterruptHandler(uint8_t interruptNumber, InterruptManager* in
 
     interruptManager->interruptHandler[interruptNumber] = this;
 }
+
 InterruptHandler::~InterruptHandler(){    
     if(interruptManager->interruptHandler[interruptNumber] == this){
         interruptManager->interruptHandler[interruptNumber] = 0;
@@ -56,7 +57,7 @@ InterruptManager::InterruptManager()
 
     setInterruptDescriptorEntry(0x20, codeSegment, &handleInterruptRequest0x00, 0, IDT_INTERRUPT_GATE);
     setInterruptDescriptorEntry(0x21, codeSegment, &handleInterruptRequest0x01, 0, IDT_INTERRUPT_GATE);
-        
+    setInterruptDescriptorEntry(0x2C, codeSegment, &handleInterruptRequest0x0C, 0, IDT_INTERRUPT_GATE);    
 
     picMasterCommand.write(0x11);   // start initialization for master
     picSlaveCommand.write(0x11);    // start initialization for slave

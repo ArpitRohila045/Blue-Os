@@ -48,10 +48,10 @@ class InterruptManager {
             uint8_t descriptorType
         );
 
-        Port8bitSlow picMasterCommand;
-        Port8bitSlow picMasterData;
-        Port8bitSlow picSlaveCommand;
-        Port8bitSlow picSlaveData;
+        Port8BitSlow picMasterCommand;
+        Port8BitSlow picMasterData;
+        Port8BitSlow picSlaveCommand;
+        Port8BitSlow picSlaveData;
         
     public:
         InterruptManager();
@@ -63,6 +63,7 @@ class InterruptManager {
         static void ignoreInterruptRequest();
         static void handleInterruptRequest0x00();  // timer interrupt
         static void handleInterruptRequest0x01();  // keyboard interrupt
+        static void handleInterruptRequest0x0C();  // mouse interrupt
 };  
 
 

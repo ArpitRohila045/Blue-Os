@@ -41,3 +41,9 @@ int print_hex(uint32_t num) {
     }
     return 0;
 }
+
+
+int putCharAt(const int8_t x, const int8_t y, const char c, const int8_t color){
+    uint16_t* videoMemory = (uint16_t*)0xB8000;
+    videoMemory[80 * y + x] = (color << 8) | c;
+}

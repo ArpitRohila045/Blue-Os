@@ -3,6 +3,7 @@
 #include "gdt/gdt.h"
 #include "interrupts/interrupts.h"
 #include "driver/keyboard.h"
+#include "driver/mouse.h"
 
 typedef void (*constructor)();
 // these symbols are defined in the linker script
@@ -57,6 +58,7 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
     InterruptManager interrupts;
 
     KeyboardDriver keyboard(&interrupts);
+    MouseDriver mouse(&interrupts);
 
     interrupts.activate();
     print("Interrupt Descriptor Table initialized.\n\n");

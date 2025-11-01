@@ -10,16 +10,17 @@
 
 class MouseDriver : public InterruptHandler{
     private:
-        Port8bit commandPort;
-        Port8bit dataPort;
+        Port8Bit commandPort;
+        Port8Bit dataPort;
 
-        uint8_t buffer[3];
+        uint8_t buffer[3];      
         uint8_t offset;
         uint8_t button;
     public :
         MouseDriver(InterruptManager* interruptManager);
         ~MouseDriver();
         virtual uint32_t handleInterrupt(uint32_t esp) override;
+
 }; 
 
 

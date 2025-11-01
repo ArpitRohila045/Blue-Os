@@ -15,7 +15,6 @@ qemu-system-x86      # x86 system emulator for testing
 bochs                # x86 PC emulator for OS development
 
 # Version Requirements
-gcc >= 9.0
 g++ >= 9.0
 nasm >= 2.15
 grub2 >= 2.04

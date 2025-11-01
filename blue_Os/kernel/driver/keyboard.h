@@ -8,8 +8,8 @@
 
 class KeyboardDriver : public InterruptHandler{
     private:
-        Port8bit commandPort;
-        Port8bit dataPort;
+        Port8Bit commandPort;
+        Port8Bit dataPort;
 
     public :
         KeyboardDriver(InterruptManager* interruptManager);

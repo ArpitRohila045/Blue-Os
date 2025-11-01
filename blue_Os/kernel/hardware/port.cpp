@@ -1,63 +1,71 @@
-#include<stdint.h>
+#include <stdint.h>
 #include "port.h"
 
-Port::Port(uint16_t portnumber){
+Port::Port(uint16_t portnumber) {
     this->portnumber = portnumber;
 }
 
-Port::~Port(){}
+Port::~Port() {}
 
-Port8bit::Port8bit(uint16_t portnumber) : Port(portnumber){}
 
-Port8bit::~Port8bit(){}
+// -------- 8-bit Port --------
+Port8Bit::Port8Bit(uint16_t portnumber)
+    : Port(portnumber) {}
 
-void Port8bit::write(uint8_t data){
+Port8Bit::~Port8Bit() {}
+
+void Port8Bit::write(uint8_t data) {
     asm volatile("outb %0, %1" : : "a"(data), "Nd"(portnumber));
 }
 
-uint8_t Port8bit::read(){
+uint8_t Port8Bit::read() {
     uint8_t result;
-    asm volatile("inb %1, %0 ": "=a"(result) : "Nd"(portnumber));
+    asm volatile("inb %1, %0" : "=a"(result) : "Nd"(portnumber));
     return result;
 }
 
 
-Port8bitSlow::Port8bitSlow(uint16_t portnumber) : Port8bit(portnumber){}
+// -------- 8-bit Slow Port --------
+Port8BitSlow::Port8BitSlow(uint16_t portnumber)
+    : Port8Bit(portnumber) {}
 
-Port8bitSlow::~Port8bitSlow(){}
+Port8BitSlow::~Port8BitSlow() {}
 
-void Port8bitSlow::write(uint8_t data){
-    asm volatile("outb %0, %1" : : "a"(data), "Nd"(portnumber));
+void Port8BitSlow::write(uint8_t data) {
+    asm volatile("outb %0, %1\njmp 1f\n1: jmp 1f\n1:"
+                 : : "a"(data), "Nd"(portnumber));
 }
 
 
+// -------- 16-bit Port --------
+Port16Bit::Port16Bit(uint16_t portnumber)
+    : Port(portnumber) {}
 
-Port16bit::Port16bit(uint16_t portnumber) : Port(portnumber){}
+Port16Bit::~Port16Bit() {}
 
-Port16bit::~Port16bit(){}
-
-void Port16bit::write(uint16_t data){
-    asm volatile("outb %0, %1" : : "a"(data), "Nd"(portnumber));
+void Port16Bit::write(uint16_t data) {
+    asm volatile("outw %0, %1" : : "a"(data), "Nd"(portnumber));
 }
 
-uint16_t Port16bit::read(){
+uint16_t Port16Bit::read() {
     uint16_t result;
-    asm volatile("inb %1, %0 ": "=a"(result) : "Nd"(portnumber));
+    asm volatile("inw %1, %0" : "=a"(result) : "Nd"(portnumber));
     return result;
 }
 
 
+// -------- 32-bit Port --------
+Port32Bit::Port32Bit(uint16_t portnumber)
+    : Port(portnumber) {}
 
-Port32bit::Port32bit(uint16_t portnumber) : Port(portnumber){}
+Port32Bit::~Port32Bit() {}
 
-Port32bit::~Port32bit(){}
-
-void Port32bit::write(uint32_t data){
-    asm volatile("outb %0, %1" : : "a"(data), "Nd"(portnumber));
+void Port32Bit::write(uint32_t data) {
+    asm volatile("outl %0, %1" : : "a"(data), "Nd"(portnumber));
 }
 
-uint32_t Port32bit::read(){
+uint32_t Port32Bit::read() {
     uint32_t result;
-    asm volatile("inb %1, %0 ": "=a"(result) : "Nd"(portnumber));
+    asm volatile("inl %1, %0" : "=a"(result) : "Nd"(portnumber));
     return result;
 }

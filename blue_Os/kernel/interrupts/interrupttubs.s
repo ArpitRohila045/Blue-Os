@@ -21,6 +21,7 @@ _ZN16InterruptManager26handleInterruptRequest\number\()Ev:
 
 handleInterruptRequest 0x00
 handleInterruptRequest 0x01
+handleInterruptRequest 0x0C
 
 int_bottom:
     # Store the current state of the CPU registers
