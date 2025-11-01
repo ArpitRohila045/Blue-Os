@@ -1,0 +1,22 @@
+# Build Tools and Dependencies
+make                    # Build automation tool
+nasm                   # Netwide Assembler for x86 assembly
+gcc                    # GNU C Compiler
+g++                    # GNU C++ Compiler
+binutils              # Collection of binary tools
+grub2                 # GRUB2 bootloader
+grub2-common          # Common files for GRUB2
+xorriso               # ISO file manipulation tool
+mtools                # MS-DOS disk manipulation utilities
+
+# Optional Development Tools
+gdb                   # GNU Debugger
+qemu-system-x86      # x86 system emulator for testing
+bochs                # x86 PC emulator for OS development
+
+# Version Requirements
+gcc >= 9.0
+g++ >= 9.0
+nasm >= 2.15
+grub2 >= 2.04
+make >= 4.3
