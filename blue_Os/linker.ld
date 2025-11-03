@@ -29,7 +29,7 @@ SECTIONS
         *(.bss)
     }
 
-    /DISCARD/:
+    /DISCARD/ :
     {
         *(.fini_array*)
         *(.comment)
