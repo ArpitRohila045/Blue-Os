@@ -1,59 +1,57 @@
-# ===== Compiler & Tools =====
+
+# sudo apt-get install g++ binutils libc6-dev-i386
+# sudo apt-get install VirtualBox grub-legacy xorriso
+
+GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
 ASPARAMS = --32
-GCCPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -g
-LDPARAMS = -m elf_i386
+LDPARAMS = -melf_i386
 
-# ===== Project Directories =====
-SRC_DIR := kernel
-BOOT_DIR := boot
-BUILD_DIR := build
-ISO_DIR := iso
-KERNEL_BIN := $(BUILD_DIR)/mykernel.bin
-ISO_FILE := mykernel.iso
+objects = obj/loader.o \
+		  obj/common/print.o \
+		  obj/gdt_flush.o \
+          obj/gdt.o \
+          obj/drivers/driver.o \
+          obj/hardwarecommunication/port.o \
+          obj/hardwarecommunication/interruptstubs.o \
+          obj/hardwarecommunication/interrupts.o \
+          obj/drivers/keyboard.o \
+          obj/drivers/mouse.o \
+          obj/kernel.o
 
-# ===== Includes =====
-INCLUDES = -I$(SRC_DIR) -I$(SRC_DIR)/gdt -I$(SRC_DIR)/hardware -I$(SRC_DIR)/interrupts -I$(SRC_DIR)/utils -I$(SRC_DIR)/driver
 
-# ===== Source File Discovery =====
-CPP_SOURCES := $(shell find $(SRC_DIR) -name '*.cpp')
-ASM_SOURCES := $(shell find $(BOOT_DIR) -name '*.s' -o -name '*.asm' -o -name '*.S')
-ASM_SOURCES += $(shell find $(SRC_DIR) -name '*.s' -o -name '*.asm' -o -name '*.S')
+run: mykernel.iso
+	(killall VirtualBox && sleep 1) || true
+	VirtualBox --startvm 'My Operating System' &
 
-OBJECTS := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CPP_SOURCES))
-OBJECTS += $(patsubst %.s, $(BUILD_DIR)/%.o, $(ASM_SOURCES))
+obj/%.o: src/%.cpp
+	mkdir -p $(@D)
+	gcc $(GCCPARAMS) -c -o $@ $<
 
-# ===== Default Target =====
-all: $(KERNEL_BIN)
+obj/%.o: src/%.s
+	mkdir -p $(@D)
+	as $(ASPARAMS) -o $@ $<
 
-# ===== Compilation Rules =====
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	gcc $(GCCPARAMS) $(INCLUDES) -c $< -o $@
+mykernel.bin: linker.ld $(objects)
+	ld $(LDPARAMS) -T $< -o $@ $(objects)
 
-$(BUILD_DIR)/%.o: %.s
-	@mkdir -p $(dir $@)
-	as $(ASPARAMS) $< -o $@
+mykernel.iso: mykernel.bin
+	mkdir iso
+	mkdir iso/boot
+	mkdir iso/boot/grub
+	cp mykernel.bin iso/boot/mykernel.bin
+	echo 'set timeout=0'                      > iso/boot/grub/grub.cfg
+	echo 'set default=0'                     >> iso/boot/grub/grub.cfg
+	echo ''                                  >> iso/boot/grub/grub.cfg
+	echo 'menuentry "My Operating System" {' >> iso/boot/grub/grub.cfg
+	echo '  multiboot /boot/mykernel.bin'    >> iso/boot/grub/grub.cfg
+	echo '  boot'                            >> iso/boot/grub/grub.cfg
+	echo '}'                                 >> iso/boot/grub/grub.cfg
+	grub-mkrescue --output=mykernel.iso iso
+	rm -rf iso
 
-# ===== Linking =====
-$(KERNEL_BIN): linker.ld $(OBJECTS)
-	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
+install: mykernel.bin
+	sudo cp $< /boot/mykernel.bin
 
-# ===== ISO Creation =====
-$(ISO_FILE): $(KERNEL_BIN)
-	mkdir -p $(ISO_DIR)/boot/grub
-	cp $(KERNEL_BIN) $(ISO_DIR)/boot/mykernel.bin
-	echo 'set timeout=0' > $(ISO_DIR)/boot/grub/grub.cfg
-	echo 'set default=0' >> $(ISO_DIR)/boot/grub/grub.cfg
-	echo 'menuentry "My Operating System" {' >> $(ISO_DIR)/boot/grub/grub.cfg
-	echo '	multiboot /boot/mykernel.bin' >> $(ISO_DIR)/boot/grub/grub.cfg
-	echo '	boot' >> $(ISO_DIR)/boot/grub/grub.cfg
-	echo '}' >> $(ISO_DIR)/boot/grub/grub.cfg
-	grub-mkrescue -o $(ISO_FILE) $(ISO_DIR)
-
-# ===== Run on QEMU =====
-run: $(ISO_FILE)
-	qemu-system-i386 -cdrom $(ISO_FILE)
-
-# ===== Clean =====
+.PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_FILE)
+	rm -rf obj mykernel.bin mykernel.iso
