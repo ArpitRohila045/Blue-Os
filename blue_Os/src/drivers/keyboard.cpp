@@ -38,7 +38,9 @@ uint32_t KeyboardDriver::handleInterrupt(uint32_t esp){
             */
             case 0xFA: break;
             case 0x45: case 0xC5: break;
-            case 0x20: print('q');
+            case 0x10: print("q"); break;
+            case 0x11: print("w"); break;
+
             default:
                 char* msg = "KEYBOARD 0x00\t";
                 char* hex = "0123456789ABCDEF";
