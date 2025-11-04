@@ -47,6 +47,7 @@ uint32_t KeyboardDriver::handleInterrupt(uint32_t esp){
     return esp;
 }
 
+
 void KeyboardDriver::activate(){
     while(commandPort.read() & 0x1)
         dataPort.read();
