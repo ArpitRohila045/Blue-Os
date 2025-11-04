@@ -6,7 +6,7 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.15-linux">
-  <Machine uuid="{571bdebb-44a8-4b04-8878-8b54875d6883}" name="Blue Os" OSType="Other" snapshotFolder="Snapshots" lastStateChange="2025-11-03T07:15:10Z">
+  <Machine uuid="{571bdebb-44a8-4b04-8878-8b54875d6883}" name="Blue Os" OSType="Other" snapshotFolder="/home/arpit/src/blue_Os" lastStateChange="2025-11-03T07:15:10Z">
     <MediaRegistry>
       <HardDisks>
         <HardDisk uuid="{719e279a-52a5-48b2-b2ca-563379ab05fd}" location="Blue Os.vdi" format="VDI" type="Normal"/>

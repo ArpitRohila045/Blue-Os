@@ -8,27 +8,24 @@ using namespace blueOs::common;
 
 static int8_t mouseX;
 static int8_t mouseY;
+static int16_t data;
 static uint16_t* vga = (uint16_t*)0xb8000;
 
 
 MouseEventHandler::MouseEventHandler(MouseDriver* mouseDriver){
-    print("MouseEventHandler is initialized on the MouseDriver");
 }
 
 
 void MouseEventHandler::onMouseUp(uint8_t button)
-{
-}
+{}
 
 
 void MouseEventHandler::onMouseDown(uint8_t button)
-{
-}
+{}
 
 
 void MouseEventHandler::onMouseMove(int x, int y)
-{
-}
+{}
 
 
 MouseDriver::MouseDriver(InterruptManager* interruptManager)
@@ -36,15 +33,15 @@ MouseDriver::MouseDriver(InterruptManager* interruptManager)
     dataPort(0x60),
     commandPort(0x64),
     mouseEventHandler(this)
-{
-}
+{}
 
 
-MouseDriver::~MouseDriver(){
-}
+MouseDriver::~MouseDriver()
+{}
 
 
-static void drawMouseCursor(const int8_t mouseX, const int8_t mouseY){
+static int16_t drawMouseCursor(const int8_t mouseX, const int8_t mouseY){
+    data = vga[80*mouseY + mouseX];
     vga[80*mouseY + mouseX] = ((vga[80*mouseY + mouseX] & 0xF000) >> 4)
                         |((vga[80*mouseY + mouseX] & 0x0F00) << 4)
                         |((vga[80*mouseY + mouseX] & 0x00FF) >> 4);
@@ -52,9 +49,7 @@ static void drawMouseCursor(const int8_t mouseX, const int8_t mouseY){
 
 
 static void clearMouseCursor(const int8_t mouseX, const int8_t mouseY){
-    vga[80*mouseY + mouseX] = ((vga[80*mouseY + mouseX] & 0xF000) >> 4)
-                        |((vga[80*mouseY + mouseX] & 0x0F000) << 4)
-                        |((vga[80*mouseY + mouseX] & 0x00FF) >> 4);
+    vga[80*mouseY + mouseX] = data;
 }
 
 

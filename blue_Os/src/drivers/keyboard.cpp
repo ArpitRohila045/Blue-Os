@@ -7,11 +7,9 @@ using namespace blueOs::hardwarecommunication;
 
 
 KeyboardEventHandler::KeyboardEventHandler(KeyboardDriver* keyboardDriver){
-    print("KeyboardEventHandler is initialized on the KeyboardDriver");
 }
 
 KeyboardEventHandler::~KeyboardEventHandler(){
-    print("KeyboardEventHandler is deleted from KeyboardDriver");
 }
 
 void KeyboardEventHandler::onKeyLeft(char){}
