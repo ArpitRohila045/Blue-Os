@@ -2,6 +2,7 @@
 #include <common/print.h>
 #include <gdt.h>
 #include <hardwarecommunication/interrupts.h>
+#include <hardwarecommunication/pci.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/driver.h>
@@ -50,9 +51,10 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
         print("Invalid multiboot magic!\n");
         while (1);
     }
-    print("Starting MyOS Kernel...\n\n");
+    print("Starting MyOS Kernel...\n");
+    print("Hardware Initialization Stage 1\n");
     init_gdt();
-    print("Global Descriptor Table initialized.\n\n");
+    print("Hardware Initialization Stage 2\n");
 
     InterruptManager interrupts;
     DriverManager driverManager; 
@@ -65,8 +67,11 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
 
     driverManager.activateAll();
     interrupts.activate();
-    
-    blueOs::common::print("Interrupt Descriptor Table initialized.\n\n");
 
+    print("Hardware Initialization Stage 3\n");
+    PeripheralComponentInterconnectController pciDevices;
+    pciDevices.selectDrivers(&driverManager);
+
+    print("Hardware Initialization Done...\n");
     while (1);
 }

@@ -7,11 +7,9 @@ using namespace blueOs::hardwarecommunication;
 
 
 KeyboardEventHandler::KeyboardEventHandler(KeyboardDriver* keyboardDriver){
-    print("KeyboardEventHandler is initialized on the KeyboardDriver");
 }
 
 KeyboardEventHandler::~KeyboardEventHandler(){
-    print("KeyboardEventHandler is deleted from KeyboardDriver");
 }
 
 void KeyboardEventHandler::onKeyLeft(char){}
@@ -88,6 +86,7 @@ uint32_t KeyboardDriver::handleInterrupt(uint32_t esp){
     }
     return esp;
 }
+
 
 void KeyboardDriver::activate(){
     while(commandPort.read() & 0x1)

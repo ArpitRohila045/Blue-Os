@@ -1,1 +1,60 @@
 /boot
+# === Build artifacts ===
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.out
+*.elf
+*.bin
+*.iso
+*.img
+*.log
+*.map
+*.dmp
+
+# === Compilers / linkers ===
+*.a
+*.lib
+*.lo
+*.la
+
+# === Intermediate files ===
+*.d
+*.tmp
+*.bak
+
+# === Editor / IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.user
+*.workspace
+*.code-workspace
+
+# === Build directories ===
+build/
+bin/
+obj/
+out/
+dist/
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Toolchain artifacts ===
+*.lst
+*.sym
+*.dump
+
+# === ISO and disk images ===
+*.vdi
+*.vmdk
+*.qcow2
+
+# === Other ===
+*.log

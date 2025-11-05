@@ -50,7 +50,6 @@ InterruptManager::InterruptManager()
     picSlaveCommand(0xA0),
     picSlaveData(0xA1)
 {
-    print("Setting up interrupt table...\n\n");
     uint16_t codeSegment = SEG_KCODE;
     const uint8_t IDT_INTERRUPT_GATE = 0xE;
 
@@ -82,7 +81,6 @@ InterruptManager::InterruptManager()
     idt.base = (unsigned int)&interruptDescriptorTable;
 
     asm volatile ("lidt %0": :"m" (idt));
-    print("interrupt table initialized...\n\n");
 }
 
 InterruptManager::~InterruptManager(){
