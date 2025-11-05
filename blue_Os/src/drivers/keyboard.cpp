@@ -31,8 +31,7 @@ uint32_t KeyboardDriver::handleInterrupt(uint32_t esp){
     if(key < 0x80){
         switch(key){
             /*
-                Pending task 
-                Map every interruppt code to its specific character;
+            Interruppt code for every key of the keyboard to its specific character;
             */
             case 0xFA: break;
             case 0x45: case 0xC5: break;
