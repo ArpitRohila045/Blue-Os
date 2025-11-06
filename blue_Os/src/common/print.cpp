@@ -4,7 +4,7 @@
 namespace blueOs {
     namespace common {
 
-        int print(char* str) {
+        void print(char* str) {
             static uint16_t* VideoMemory = (uint16_t*)0xb8000;
 
             static uint8_t x=0,y=0;
@@ -38,7 +38,6 @@ namespace blueOs {
                     y = 0;
                 }
             }
-            return 0;
         }
 
         int print_dec(uint32_t num) {
@@ -56,7 +55,7 @@ namespace blueOs {
             return 0;
         }
 
-        int print_hex(uint8_t key) {
+        void print_hex(uint8_t key) {
                 char* foo = "00";
                 char* hex = "0123456789ABCDEF";
                 foo[0] = hex[(key >> 4) & 0xF];
