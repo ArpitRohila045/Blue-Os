@@ -28,7 +28,7 @@ VideoGraphicsArray::VideoGraphicsArray():
             void VideoGraphicsArray::WriteRegisters(uint8_t* registers){ //this function is to  initialize the ports.
                 // --- Write to VGA Miscellaneous Output Register ---
                 // Sets basic video mode parameters: clock, sync polarity, etc.
-                miscPort.Write(*(registers++));
+                miscPort.write(*(registers++));
 
 
                 // --- Program VGA Sequencer Registers ---
