@@ -6,7 +6,7 @@ namespace blueOs{
     namespace common{
         int print(char*);
         int print_dec(uint32_t);
-        int print_hex(uint32_t);
+        int print_hex(uint8_t);
         int putCharAt(int8_t,int8_t,char,int8_t);
     }
 }

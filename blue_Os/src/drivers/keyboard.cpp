@@ -73,8 +73,6 @@ uint32_t KeyboardDriver::handleInterrupt(uint32_t esp){
             case 0x0B: print("0"); break;
 
 
-
-
             default:
                 char* msg = "KEYBOARD 0x00\t";
                 char* hex = "0123456789ABCDEF";
