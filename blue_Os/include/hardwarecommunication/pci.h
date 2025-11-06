@@ -8,6 +8,28 @@
 
 namespace blueOs{
     namespace hardwarecommunication{
+
+        enum BaseAddressRegisterType
+        {
+            MemoryMapping = 0,
+            InputOutput = 1
+        };
+
+        class BaseAddressRegister{
+            public:
+                bool prefetchable;
+                blueOs::common::uint8_t* address;
+                blueOs::common::uint32_t size;
+                /*
+                    The Type field of the Memory Space BAR Layout specifies the size of the base register and where in memory it can be mapped.
+                    If it has a value of 0x0 then the base register is 32-bits wide and can be mapped anywhere in the 32-bit Memory Space.
+                    A value of 0x2 means the base register is 64-bits wide and can be mapped anywhere in the 64-bit Memory Space 
+                        (A 64-bit base address register consumes 2 of the base address registers available).
+                    A value of 0x1 is reserved as of revision 3.0 of the PCI Local Bus Specification.
+                    In earlier versions it was used to support memory space below 1MB (16-bit wide base register that can be mapped anywhere in the 16-bit Memory Space).
+                */
+                BaseAddressRegisterType type;
+        };
         
         class PeripheralComponentInterconnectDeviceDescriptor{
             public:
@@ -50,7 +72,8 @@ namespace blueOs{
                     blueOs::common::uint16_t device,
                     blueOs::common::uint16_t function,
                     blueOs::common::uint32_t registerOffset
-                );             
+                );
+
                 void write(
                     blueOs::common::uint16_t bus,
                     blueOs::common::uint16_t device,
@@ -58,10 +81,33 @@ namespace blueOs{
                     blueOs::common::uint32_t registerOffset,
                     blueOs::common::int32_t data
                 );
-                bool hasFunctions(blueOs::common::uint16_t bus, blueOs::common::uint16_t device);
-                void selectDrivers(blueOs::drivers::DriverManager* driverManager);
-                PeripheralComponentInterconnectDeviceDescriptor GetDeviceDescriptor(blueOs::common::uint16_t bus, blueOs::common::uint16_t device, blueOs::common::uint16_t function);        };
-    }
+
+                bool hasFunctions(
+                    blueOs::common::uint16_t bus, blueOs::common::uint16_t device
+                );
+
+                void selectDrivers(
+                    blueOs::drivers::DriverManager* driverManager,
+                    blueOs::hardwarecommunication::InterruptManager* interrupts
+                );
+
+                PeripheralComponentInterconnectDeviceDescriptor getDeviceDescriptor(
+                    blueOs::common::uint16_t bus, blueOs::common::uint16_t device, blueOs::common::uint16_t function
+                );
+
+                BaseAddressRegister getBaseAddressRegister(
+                    blueOs::common::uint16_t bus,
+                    blueOs::common::uint16_t device,
+                    blueOs::common::uint16_t function,
+                    blueOs::common::uint16_t barNum
+                );
+
+                blueOs::drivers::Driver* getDriver(
+                    PeripheralComponentInterconnectDeviceDescriptor descriptor, 
+                    blueOs::hardwarecommunication::InterruptManager* interruptManager
+                );
+            };
+    }   
 }
 
 #endif

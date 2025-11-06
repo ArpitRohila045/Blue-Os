@@ -71,7 +71,7 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
 
     print("Hardware Initialization Stage 3\n");
     PeripheralComponentInterconnectController pciDevices;
-    pciDevices.selectDrivers(&driverManager);
+    pciDevices.selectDrivers(&driverManager, &interrupts);
 
     VideoGraphicsArray vga;
 

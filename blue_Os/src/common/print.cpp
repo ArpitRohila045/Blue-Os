@@ -56,7 +56,7 @@ namespace blueOs {
             return 0;
         }
 
-        int print_hex(uint32_t key) {
+        int print_hex(uint8_t key) {
                 char* foo = "00";
                 char* hex = "0123456789ABCDEF";
                 foo[0] = hex[(key >> 4) & 0xF];

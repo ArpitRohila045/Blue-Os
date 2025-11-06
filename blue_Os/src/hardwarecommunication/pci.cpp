@@ -1,9 +1,11 @@
 #include <hardwarecommunication/pci.h>
+#include <drivers/driver.h>
 #include <common/print.h>
 #include <common/types.h>
 
 using namespace blueOs::common;
 using namespace blueOs::hardwarecommunication;
+using namespace blueOs::drivers;
 
 PeripheralComponentInterconnectDeviceDescriptor::PeripheralComponentInterconnectDeviceDescriptor(){}
 
@@ -33,11 +35,11 @@ uint32_t PeripheralComponentInterconnectController::read(
         | ((bus & 0xFF) << 16)
         | ((device & 0x1F) << 11)
         | ((function & 0x0F) << 8)
-        | (registerOffset);
+        | ((registerOffset & 0xFC));
     
     commandPort.write(id);
-    blueOs::common::uint32_t result = dataPort.read();
-    return result;
+    uint32_t result = dataPort.read();
+    return result >> (8 * (registerOffset % 4));
 }     
 
 uint32_t PeripheralComponentInterconnectController::readByte(
@@ -73,7 +75,7 @@ void PeripheralComponentInterconnectController::write(
         | ((bus & 0xFF) << 16)
         | ((device & 0x1F) << 11)
         | ((function & 0x0F) << 8)
-        | ((registerOffset << 0xFC));
+        | ((registerOffset & 0xFC));
     commandPort.write(id);
     dataPort.write(data);
 }
@@ -82,19 +84,28 @@ bool PeripheralComponentInterconnectController::hasFunctions(blueOs::common::uin
     return read(bus, device, 0, 0x0E) & (1<<7);
 }
 
-void PeripheralComponentInterconnectController::selectDrivers(blueOs::drivers::DriverManager* driverManager){    
-    for(int bus = 0; bus < 8; bus++)
-    {
-        for(int device = 0; device < 32; device++)
-        {
+void PeripheralComponentInterconnectController::selectDrivers(
+    blueOs::drivers::DriverManager* driverManager, 
+    blueOs::hardwarecommunication::InterruptManager* interrupts
+){    
+
+    for(uint16_t bus = 0; bus < 8; bus++){
+        for(uint16_t device = 0; device < 32; device++){
+
             int numFunctions = hasFunctions(bus, device) ? 8 : 1;
-            for(int function = 0; function < numFunctions; function++)
-            {
-                PeripheralComponentInterconnectDeviceDescriptor dev = GetDeviceDescriptor(bus, device, function);
-                
-                if(dev.vendor_id == 0x0000 || dev.vendor_id == 0xFFFF)
+
+            for(uint16_t function = 0; function < numFunctions; function++){
+
+                PeripheralComponentInterconnectDeviceDescriptor deviceDescriptor = getDeviceDescriptor(bus, device, function);
+                if(deviceDescriptor.vendor_id == 0x0000 || deviceDescriptor.vendor_id == 0xFFFF)
                     continue;
 
+                for(uint8_t barNum = 0; barNum < 6; barNum++){
+                    BaseAddressRegister baseAddressRegister = getBaseAddressRegister(bus, device, function, barNum);
+
+                    if(baseAddressRegister.address && (baseAddressRegister.type == InputOutput))
+                        deviceDescriptor.portBase = (uint32_t)baseAddressRegister.address;
+                }
                 
                 print("PCI BUS ");
                 print_hex(bus & 0xFF);
@@ -106,18 +117,20 @@ void PeripheralComponentInterconnectController::selectDrivers(blueOs::drivers::D
                 print_hex(function & 0xFF);
                 
                 print(" = VENDOR ");
-                print_hex((dev.vendor_id & 0xFF00) >> 8);
-                print_hex(dev.vendor_id & 0xFF);
+                print_hex((deviceDescriptor.vendor_id & 0xFF00) >> 8);
+                print_hex(deviceDescriptor.vendor_id & 0xFF);
                 print(", DEVICE ");
-                print_hex((dev.device_id & 0xFF00) >> 8);
-                print_hex(dev.device_id & 0xFF);
+                print_hex((deviceDescriptor.device_id & 0xFF00) >> 8);
+                print_hex(deviceDescriptor.device_id & 0xFF);
                 print("\n");
             }
         }
     }
 }
 
-PeripheralComponentInterconnectDeviceDescriptor PeripheralComponentInterconnectController::GetDeviceDescriptor(uint16_t bus, uint16_t device, uint16_t function)
+PeripheralComponentInterconnectDeviceDescriptor PeripheralComponentInterconnectController::getDeviceDescriptor(
+    uint16_t bus, uint16_t device, uint16_t function
+)
 {
     PeripheralComponentInterconnectDeviceDescriptor result;
     
@@ -138,3 +151,42 @@ PeripheralComponentInterconnectDeviceDescriptor PeripheralComponentInterconnectC
     return result;
 }
 
+BaseAddressRegister PeripheralComponentInterconnectController::getBaseAddressRegister(
+    uint16_t bus, uint16_t device, uint16_t function, uint16_t barNum
+){
+    BaseAddressRegister result;
+    
+    uint32_t headertype = read(bus, device, function, 0x0E) & 0x7F;
+    int maxBARs = 6 - (4*headertype);
+    if(barNum >= maxBARs)
+        return result;
+    
+    uint32_t bar_value = read(bus, device, function, 0x10 + 4*barNum);
+    result.type = (bar_value & 0x1) ? InputOutput : MemoryMapping;
+    uint32_t temp;
+    
+    if(result.type == MemoryMapping)
+    {
+        switch((bar_value >> 1) & 0x3)
+        {
+            
+            case 0: // 32 Bit Mode
+            case 1: // 20 Bit Mode
+            case 2: // 64 Bit Mode
+                break;
+        }
+    }
+    else // InputOutput
+    {
+        result.address = (uint8_t*)(bar_value & ~0x3);
+        result.prefetchable = false;
+    }
+    return result;
+}
+
+Driver* getDriver(
+    PeripheralComponentInterconnectDeviceDescriptor descriptor, 
+    blueOs::hardwarecommunication::InterruptManager* interruptManager
+){
+    return 0;
+}
