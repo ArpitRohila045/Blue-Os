@@ -6,6 +6,7 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/driver.h>
+#include<drivers/vga.h>
 
 using namespace blueOs;
 using namespace blueOs::hardwarecommunication;
@@ -72,6 +73,16 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
     PeripheralComponentInterconnectController pciDevices;
     pciDevices.selectDrivers(&driverManager);
 
+    VideoGraphicsArray vga;
+
+
     print("Hardware Initialization Done...\n");
+
+    vga.SetMode(320,200,8);
+    for(uint32_t y=0; y< 200; y++)
+        for(uint32_t x=0; x<320; x++)
+            vga.PutPixel(x,y,0x00,0x00,0xA8);
+
+            
     while (1);
 }
