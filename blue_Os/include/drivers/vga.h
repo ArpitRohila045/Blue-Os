@@ -1,5 +1,5 @@
-#ifndef _BLUE_OS_DRIVERS_VGS_H
-#define _BLUE_OS_DRIVERS_VGS_H
+#ifndef _BLUE_OS_DRIVERS_VGA_H
+#define _BLUE_OS_DRIVERS_VGA_H
 
 #include<common/types.h>
 #include<hardwarecommunication/port.h>
