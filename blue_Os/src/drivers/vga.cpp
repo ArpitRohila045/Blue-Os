@@ -7,10 +7,10 @@ using namespace blueOs::drivers;
 
 VideoGraphicsArray::VideoGraphicsArray():
         miscPort(0x3c2),
-        crtcDataPort(0x3d4),
-        crtcIndexPort(0x3d5),
-        sequencerDataPort(0x3c4),
-        sequencerIndexPort(0x3c5),
+        crtcIndexPort(0x3d4),
+        crtcDataPort(0x3d5),
+        sequencerIndexPort(0x3c4),
+        sequencerDataPort(0x3c5),
         graphicsControllerIndexPort(0x3ce),
         graphicsControllerDataPort(0x3cf),
         attributeControllerIndexPort(0x3c0),
