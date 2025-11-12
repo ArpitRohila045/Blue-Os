@@ -1,9 +1,12 @@
 #include <hardwarecommunication/interrupts.h>
 #include <common/print.h>
 #include <gdt.h>
+#include <multitasking.h>
+
 
 using namespace blueOs::hardwarecommunication;
 using namespace blueOs::common;
+using namespace blueOs;
 
 InterruptHandler::InterruptHandler(uint8_t interruptNumber, InterruptManager* interruptManager){
     this->interruptNumber = interruptNumber;
@@ -37,20 +40,21 @@ void InterruptManager::setInterruptDescriptorEntry(
 ){
     uint32_t handlerAddr = (uint32_t) handler;
     interruptDescriptorTable[interruptNumber].handlerAddressLowerBits = handlerAddr & 0xFFFF;
-    interruptDescriptorTable[interruptNumber].gdt_codeSegmentSelector = codeSegmentSelector;
+    interruptDescriptorTable[interruptNumber].gdt_codeSegmentSelector = codeSegmentSelector;   // weather the interrupt handles in kernel or user mode
     interruptDescriptorTable[interruptNumber].reserved = 0;
     // descriptorType should already encode present (0x80), privilege and gate type (0x0E for 32-bit interrupt gate).
     interruptDescriptorTable[interruptNumber].access = (0x80) | ((descriptorPriviledgeLevel & 0x3) << 5) | (descriptorType & 0x1F);
     interruptDescriptorTable[interruptNumber].handlerAddressHighBits = (handlerAddr >> 16) & 0xFFFF;
 }
 
-InterruptManager::InterruptManager()
-:   picMasterCommand(0x20),
+InterruptManager::InterruptManager(TaskManager* taskManager)
+:   picMasterCommand(0x20),  
     picMasterData(0x21),
     picSlaveCommand(0xA0),
     picSlaveData(0xA1)
 {
-    uint16_t codeSegment = SEG_KCODE;
+    this->taskManager = taskManager;
+    uint16_t codeSegment = 0x08;
     const uint8_t IDT_INTERRUPT_GATE = 0xE;
 
     for(uint16_t interrupt = 0; interrupt < 256; interrupt++){
@@ -80,7 +84,7 @@ InterruptManager::InterruptManager()
     idt.size = sizeof(interruptDescriptorTable) - 1;
     idt.base = (unsigned int)&interruptDescriptorTable;
 
-    asm volatile ("lidt %0": :"m" (idt));
+    asm volatile ("lidt %0": :"m" (idt));  
 }
 
 InterruptManager::~InterruptManager(){
@@ -104,7 +108,7 @@ void InterruptManager::deactivate(){
 
 uint32_t InterruptManager::handleInterrupt(uint32_t interruptnumber, uint32_t esp){
     if(activeInterruptManager != 0){
-        activeInterruptManager->doHandleInterrupt(interruptnumber, esp);
+        esp = activeInterruptManager->doHandleInterrupt(interruptnumber, esp);
     }
     return esp;
 }
@@ -119,6 +123,12 @@ uint32_t InterruptManager::doHandleInterrupt(uint32_t interruptNumber, uint32_t 
         msg[22] = hex[(interruptNumber >> 4) & 0x0F];
         msg[23] = hex[interruptNumber & 0x0F];
         print(msg);
+    }
+
+    if (interruptNumber == 0x20) {
+        // multitasking timer interrupt
+        // we can perform task switching here
+        esp = (uint32_t)taskManager->schedule((CPUState*)esp);
     }
 
     if(0x20 <= interruptNumber && 0x30 >= interruptNumber){

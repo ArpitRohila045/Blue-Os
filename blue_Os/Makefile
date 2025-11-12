@@ -10,6 +10,7 @@ objects = obj/loader.o \
 		  obj/common/print.o \
 		  obj/gdt_flush.o \
           obj/gdt.o \
+		  obj/multitasking.o \
           obj/drivers/driver.o \
           obj/hardwarecommunication/port.o \
           obj/hardwarecommunication/interruptstubs.o \
@@ -18,12 +19,12 @@ objects = obj/loader.o \
           obj/drivers/mouse.o \
 		  obj/hardwarecommunication/pci.o	\
 		  obj/drivers/vga.o \
+		  obj/memory/multiboot.o \
           obj/kernel.o
 
 
 run: mykernel.iso
-	(killall VirtualBox && sleep 1) || true
-	VirtualBox --startvm 'My Operating System' &
+
 
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)

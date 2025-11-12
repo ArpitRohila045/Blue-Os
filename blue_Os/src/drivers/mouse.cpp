@@ -6,8 +6,8 @@ using namespace blueOs::drivers;
 using namespace blueOs::hardwarecommunication;
 using namespace blueOs::common;
 
-static int8_t mouseX;
-static int8_t mouseY;
+static blueOs::common::int8_t mouseX;
+static blueOs::common::int8_t mouseY;
 static int16_t data;
 static uint16_t* vga = (uint16_t*)0xb8000;
 
@@ -40,7 +40,7 @@ MouseDriver::~MouseDriver()
 {}
 
 
-static int16_t drawMouseCursor(const int8_t mouseX, const int8_t mouseY){
+static int16_t drawMouseCursor(const blueOs::common::int8_t mouseX, const blueOs::common::int8_t mouseY){
     data = vga[80*mouseY + mouseX];
     vga[80*mouseY + mouseX] = ((vga[80*mouseY + mouseX] & 0xF000) >> 4)
                         |((vga[80*mouseY + mouseX] & 0x0F00) << 4)
@@ -48,7 +48,8 @@ static int16_t drawMouseCursor(const int8_t mouseX, const int8_t mouseY){
 }
 
 
-static void clearMouseCursor(const int8_t mouseX, const int8_t mouseY){
+static void clearMouseCursor(const blueOs::common::int8_t mouseX, const blueOs::common::
+    int8_t mouseY){
     vga[80*mouseY + mouseX] = data;
 }
 

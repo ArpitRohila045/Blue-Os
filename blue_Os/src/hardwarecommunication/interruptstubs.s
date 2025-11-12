@@ -16,6 +16,7 @@ _ZN6blueOs21hardwarecommunication16InterruptManager16handleException\number\()Ev
 .global _ZN6blueOs21hardwarecommunication16InterruptManager26handleInterruptRequest\number\()Ev
 _ZN6blueOs21hardwarecommunication16InterruptManager26handleInterruptRequest\number\()Ev:
     movb $\number + IRQ_BASE, interruptnumber
+    pushl $0
     jmp int_bottom
 .endm
 
@@ -24,24 +25,52 @@ handleInterruptRequest 0x01
 handleInterruptRequest 0x0C
 
 int_bottom:
-    # Store the current state of the CPU registers
-    pusha
-    push %ds
-    push %es
-    push %fs
-    push %gs
+    # save registers
+    #pusha
+    #pushl %ds
+    #pushl %es
+    #pushl %fs
+    #pushl %gs
+    
+    pushl %ebp
+    pushl %edi
+    pushl %esi
 
+    pushl %edx
+    pushl %ecx
+    pushl %ebx
+    pushl %eax
+
+    # load ring 0 segment register
+    # cld
+    #mov $0x10, %eax
+    #mov %eax, %eds
+    #mov %eax, %ees
+
+    # call C++ Handler
     pushl %esp
-    pushl interruptnumber
+    push (interruptnumber)
     call _ZN6blueOs21hardwarecommunication16InterruptManager15handleInterruptEjj
+    # add %esp, 6
+    mov %eax, %esp # switch the stack
 
-    movl %eax, %esp
+    # restore registers
+    popl %eax
+    popl %ebx
+    popl %ecx
+    popl %edx
 
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
-    popa
+    popl %esi
+    popl %edi
+    popl %ebp
+    #pop %gs
+    #pop %fs
+    #pop %es
+    #pop %ds
+    #popa
+    
+    add $4, %esp
+
 
 _ZN6blueOs21hardwarecommunication16InterruptManager22ignoreInterruptRequestEv:
     iret

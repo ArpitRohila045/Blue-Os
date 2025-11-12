@@ -63,6 +63,20 @@ namespace blueOs {
                 print(foo);
         }
 
+        void print_hex32(uint32_t key){
+            char* foo = "00000000";
+            char* hex = "0123456789ABCDEF";
+            foo[0] = hex[(key >> 28) & 0xF];
+            foo[1] = hex[(key >> 24) & 0xF];
+            foo[2] = hex[(key >> 20) & 0xF];
+            foo[3] = hex[(key >> 16) & 0xF];
+            foo[4] = hex[(key >> 12) & 0xF];
+            foo[5] = hex[(key >> 8) & 0xF];
+            foo[6] = hex[(key >> 4) & 0xF];
+            foo[7] = hex[key & 0xF];
+            print(foo);
+        }
+        
         int putCharAt(int8_t x, int8_t y, char c, int8_t color) {
             uint16_t* videoMemory = (uint16_t*)0xB8000;
             videoMemory[80 * y + x] = (color << 8) | c;

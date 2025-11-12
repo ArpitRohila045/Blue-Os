@@ -3,6 +3,7 @@
 
 #include <common/types.h>
 #include <hardwarecommunication/port.h>
+#include <multitasking.h>
 
 using namespace blueOs::common;
 
@@ -26,6 +27,8 @@ namespace blueOs{
             protected:
                 static InterruptManager* activeInterruptManager;
                 InterruptHandler* interruptHandler[256];
+                TaskManager* taskManager;
+                
                 struct GateDescriptor{
                     uint16_t handlerAddressLowerBits;
                     uint16_t gdt_codeSegmentSelector;
@@ -56,7 +59,7 @@ namespace blueOs{
                 Port8BitSlow picSlaveData;
                 
             public:
-                InterruptManager();
+                InterruptManager(TaskManager* taskManager);
                 ~InterruptManager();
                 static uint32_t handleInterrupt(uint32_t interruptnumber, uint32_t esp);
                 uint32_t doHandleInterrupt(uint32_t interruptnmber, uint32_t esp);
