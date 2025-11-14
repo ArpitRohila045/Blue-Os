@@ -7,6 +7,7 @@
 #include <drivers/mouse.h>
 #include <drivers/driver.h>
 #include <drivers/vga.h>
+#include <drivers/ata.h>
 #include <multitasking.h>
 #include <memory/multiboot.h>
 #include <memory/memorymanagment.h>
@@ -83,7 +84,7 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
 
     print("Hardware Initialization Stage 3\n");
     PeripheralComponentInterconnectController pciDevices;
-    pciDevices.selectDrivers(&driverManager, &interrupts);
+    // pciDevices.selectDrivers(&driverManager, &interrupts);
 
     VideoGraphicsArray vga;
 
@@ -96,9 +97,29 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     //         vga.PutPixel(x,y,0x00,0x00,0xA8);
 
 
-        
+    print("\nS-ATA primary master: ");
+    AdvanceTechnologyAttachment ata0m(true, 0x1F0);
+    ata0m.identify();
+    
+    print("\nS-ATA primary slave: ");
+    AdvanceTechnologyAttachment ata0s(false, 0x1F0);
+    ata0s.identify();
+    ata0s.write28(0, (uint8_t*)"http://www.AlgorithMan.de", 25);
+    ata0s.flush();
+    ata0s.read28(0, 25);
+    
+    print("\nS-ATA secondary master: ");
+    AdvanceTechnologyAttachment ata1m(true, 0x170);
+    ata1m.identify();
+    
+    print("\nS-ATA secondary slave: ");
+    AdvanceTechnologyAttachment ata1s(false, 0x170);
+    ata1s.identify();
+    // third: 0x1E8
+    // fourth: 0x168
+
     interrupts.activate();
 
-    meminfo(addr);
+    // meminfo(addr);
     while (1);
 }

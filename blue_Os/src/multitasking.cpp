@@ -26,7 +26,6 @@ Task::Task(void entrypoint(), uint32_t burst, uint32_t prio)
     cpustate->ebp = 0;
 
     cpustate->eip = (uint32_t)entrypoint;
-<<<<<<< HEAD
 
     /*
      * Code segment selector (CS) — defines which privilege level
@@ -42,10 +41,6 @@ Task::Task(void entrypoint(), uint32_t burst, uint32_t prio)
      *   Bit 9: IF = 1 (interrupts enabled)
      */
     cpustate->eflags = 0x202;
-=======
-    cpustate->cs  = 0x08;
-    cpustate->eflags = 0x202;   // interrupts enabled
->>>>>>> 552f472b642ea32ac4f5f49cf8a603e6f63b071c
 }
 
 Task::~Task() {}

@@ -1,9 +1,5 @@
-// ...existing code...
-extern "C" void operator delete(void* ptr) noexcept {
-    (void)ptr;
-    // TODO: hook into kernel allocator if available.
-}
+// delete.cpp
+// This file intentionally doesn't provide operator delete implementations
+// because they are implemented in `src/memory/memorymanagment.cpp`.
+// Keep this file as a placeholder for platform-specific delete helpers.
 
-extern "C" void operator delete(void* ptr, unsigned int) noexcept {
-    operator delete(ptr);
-}

@@ -89,7 +89,7 @@ void AdvanceTechnologyAttachment::identify(){
         uint16_t data = dataPort.read();
 
         // ATA strings are transmitted in swapped byte order
-        char *text = "  \0";
+        char *text = "  ";
         text[0] = (data >> 8) & 0xFF;
         text[1] = data & 0xFF;
 

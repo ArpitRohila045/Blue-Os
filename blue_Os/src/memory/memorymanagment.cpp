@@ -121,6 +121,17 @@ void operator delete[](void* ptr){
     blueOs::memory::MemoryManager::activeMemoryManager->kfree(ptr);
 }
 
+// Sized delete overloads (some compilers emit calls to these when size is known)
+void operator delete(void* ptr, unsigned size){
+    (void)size;
+    operator delete(ptr);
+}
+
+void operator delete[](void* ptr, unsigned size){
+    (void)size;
+    operator delete[](ptr);
+}
+
 
 
 

@@ -8,11 +8,8 @@ LDPARAMS = -melf_i386
 
 objects = obj/loader.o \
 		  obj/common/print.o \
-<<<<<<< HEAD
 		  obj/memory/memorymanagment.o \
-=======
 		  obj/common/delete.o \
->>>>>>> 552f472b642ea32ac4f5f49cf8a603e6f63b071c
 		  obj/gdt_flush.o \
           obj/gdt.o \
 		  obj/multitasking.o \
@@ -33,8 +30,7 @@ objects = obj/loader.o \
 
 
 run: mykernel.iso
-	(killall VirtualBox && sleep 1) || true
-	VirtualBox --startvm 'My Operating System' &
+
 
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)
