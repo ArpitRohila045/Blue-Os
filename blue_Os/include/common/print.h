@@ -7,6 +7,7 @@ namespace blueOs{
         void print(char*);
         int print_dec(uint32_t);
         void print_hex(uint8_t);
+        void print_hex32(uint32_t);
         int putCharAt(int8_t,int8_t,char,int8_t);
     }
 }
