@@ -19,6 +19,49 @@ using namespace blueOs::common;
 using namespace blueOs::memory;
 
 
+// Short-running task (fast CPU burst)
+void fastTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("FAST: ");
+        print_hex32(counter++);
+        print("\n");
+
+        // Small delay — simulates short burst
+        for (volatile int i = 0; i < 300000; i++);
+    }
+}
+
+// Long-running task (slow CPU burst)
+void slowTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("SLOW: ");
+        print_hex32(counter++);
+        print("\n");
+
+        // Larger delay — simulates longer burst
+        for (volatile int i = 0; i < 1500000; i++);
+    }
+}
+
+// Optional third task (medium CPU burst)
+void mediumTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("MEDIUM: ");
+        print_hex32(counter++);
+        print("\n");
+
+        for (volatile int i = 0; i < 800000; i++);
+    }
+}
+
+/*
+ * ------------------------------
+ * Kernel Constructors / Setup
+ * ------------------------------
+ */
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
 extern "C" constructor end_ctors;
@@ -63,13 +106,15 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     // print("Hardware Initialization Stage 2\n");
 
     TaskManager taskManager;
-    /*
-    Task task1(&taskA);
-    Task task2(&taskB);
-    taskManager.addTask(&task1);
-    taskManager.addTask(&task2);
-    */
+    Task t1(&fastTask, 3);    // short burst time
+    Task t2(&mediumTask, 6);  // medium burst
+    Task t3(&slowTask, 10);   // long burst
 
+    // taskManager.addTask(&t1);
+    // taskManager.addTask(&t2);
+    // taskManager.addTask(&t3);
+
+    // Initialize interrupts and drivers
     InterruptManager interrupts(&taskManager);
     DriverManager driverManager; 
 
