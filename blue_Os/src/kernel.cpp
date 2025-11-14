@@ -9,13 +9,13 @@
 #include <drivers/vga.h>
 #include <multitasking.h>
 #include <memory/multiboot.h>
-
+#include <memory/memorymanagment.h>
 
 using namespace blueOs;
 using namespace blueOs::hardwarecommunication;
 using namespace blueOs::drivers;
 using namespace blueOs::common;
-
+using namespace blueOs::memory;
 
 
 typedef void (*constructor)();
@@ -50,29 +50,8 @@ MemoryManager setup_memory(multiboot_info* mbi) {
     return memoryManager;
 }
 
-typedef struct multiboot_info {
-    uint32_t flags;
-    uint32_t mem_lower;
-    uint32_t mem_upper;
-    uint32_t boot_device;
-    uint32_t cmdline;
-    uint32_t mods_count;
-    uint32_t mods_addr;
-    uint32_t syms[4];
-    uint32_t mmap_length;
-    uint32_t mmap_addr;
-} __attribute__((packed)) multiboot_info_t;
 
-
-typedef struct multiboot_mmap_entry {
-    uint32_t size;
-    uint64_t addr;
-    uint64_t len;
-    uint32_t type;
-} __attribute__((packed)) multiboot_mmap_entry_t;
-
-
-extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
+extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     if (magic != 0x2BADB002) {
         print("Invalid multiboot magic!\n");
         while (1);
@@ -90,7 +69,7 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
     taskManager.addTask(&task2);
     */
 
-    InterruptManager interrupts;
+    InterruptManager interrupts(&taskManager);
     DriverManager driverManager; 
 
     KeyboardDriver keyboard(&interrupts);
@@ -104,7 +83,7 @@ extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
 
     print("Hardware Initialization Stage 3\n");
     PeripheralComponentInterconnectController pciDevices;
-    pciDevices.selectDrivers(&driverManager);
+    pciDevices.selectDrivers(&driverManager, &interrupts);
 
     VideoGraphicsArray vga;
 

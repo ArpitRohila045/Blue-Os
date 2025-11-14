@@ -88,7 +88,6 @@ InterruptManager::InterruptManager(TaskManager* taskManager)
 }
 
 InterruptManager::~InterruptManager(){
-
 }
 
 void InterruptManager::activate(){

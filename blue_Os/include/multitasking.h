@@ -44,18 +44,6 @@ namespace blueOs {
         ~Task();
     };
 
-<<<<<<< HEAD
-    class TaskManager{
-        private:
-            Task* tasks[256];
-            int numTasks;
-            int currentTask;
-        public:
-            TaskManager();
-            ~TaskManager();
-            bool addTask(Task* task);
-            CPUState* schedule(CPUState* cpustate); 
-=======
 
     class TaskManager {
     private:
@@ -76,7 +64,6 @@ namespace blueOs {
         CPUState* sjf(CPUState* cpustate);
         CPUState* srtf(CPUState* cpustate);
         CPUState* prioritySchedule(CPUState* cpustate);
->>>>>>> 552f472b642ea32ac4f5f49cf8a603e6f63b071c
     };
 
 }
