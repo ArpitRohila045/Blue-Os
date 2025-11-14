@@ -22,7 +22,7 @@ void fastTask() {
     uint32_t counter = 0;
     while (1) {
         print("FAST: ");
-        printHex(counter++);
+        print_hex32(counter++);
         print("\n");
 
         // Small delay — simulates short burst
@@ -35,7 +35,7 @@ void slowTask() {
     uint32_t counter = 0;
     while (1) {
         print("SLOW: ");
-        printHex(counter++);
+        print_hex32(counter++);
         print("\n");
 
         // Larger delay — simulates longer burst
@@ -48,7 +48,7 @@ void mediumTask() {
     uint32_t counter = 0;
     while (1) {
         print("MEDIUM: ");
-        printHex(counter++);
+        print_hex32(counter++);
         print("\n");
 
         for (volatile int i = 0; i < 800000; i++);
@@ -90,9 +90,9 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     Task t2(&mediumTask, 6);  // medium burst
     Task t3(&slowTask, 10);   // long burst
 
-    taskManager.addTask(&t1);
-    taskManager.addTask(&t2);
-    taskManager.addTask(&t3);
+    // taskManager.addTask(&t1);
+    // taskManager.addTask(&t2);
+    // taskManager.addTask(&t3);
 
     // Initialize interrupts and drivers
     InterruptManager interrupts(&taskManager);
