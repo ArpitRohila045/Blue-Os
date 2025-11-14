@@ -52,7 +52,7 @@ Task::Task(void entrypoint()) {
      * and memory segment this task runs in.
      * For kernel-level multitasking, this usually points to SEG_KCODE.
      */
-    cpustate->cs = 0x08; // Kernel code segment selector
+    cpustate->cs = 0x08;  // Kernel code segment selector
 
     /*
      * EFLAGS is set with bit 9 (the interrupt enable flag) = 1.
@@ -123,4 +123,18 @@ CPUState* TaskManager::schedule(CPUState* cpustate) {
 
     // Return the CPU state of the next task
     return tasks[currentTask]->cpustate;
+
+    // First-Come, First-Served (FCFS) Scheduling
+    // return fcfs(cpustate);
 }
+
+
+// CPUState* fcfs(CPUState* cpusate){
+
+// }
+
+// CPUState* srtf(CPUState* cpusate){
+
+// }
+
+

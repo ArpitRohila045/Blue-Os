@@ -8,6 +8,7 @@ LDPARAMS = -melf_i386
 
 objects = obj/loader.o \
 		  obj/common/print.o \
+		  obj/memory/memorymanagment.o \
 		  obj/gdt_flush.o \
           obj/gdt.o \
 		  obj/multitasking.o \
@@ -20,6 +21,7 @@ objects = obj/loader.o \
 		  obj/hardwarecommunication/pci.o	\
 		  obj/drivers/vga.o \
 		  obj/memory/multiboot.o \
+		  obj/drivers/ata.o \
           obj/kernel.o
 
 

@@ -52,7 +52,7 @@ namespace blueOs{
             TaskManager();
             ~TaskManager();
             bool addTask(Task* task);
-            CPUState* schedule(CPUState* cpustate);
+            CPUState* schedule(CPUState* cpustate); 
     };
 }
 
