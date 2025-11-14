@@ -6,82 +6,115 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/driver.h>
-#include<drivers/vga.h>
+#include <drivers/vga.h>
+#include <multitasking.h>
+#include <memory/multiboot.h>
 
 using namespace blueOs;
 using namespace blueOs::hardwarecommunication;
 using namespace blueOs::drivers;
 using namespace blueOs::common;
+using namespace blueOs::memory;
 
 
+// Short-running task (fast CPU burst)
+void fastTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("FAST: ");
+        printHex(counter++);
+        print("\n");
 
+        // Small delay — simulates short burst
+        for (volatile int i = 0; i < 300000; i++);
+    }
+}
+
+// Long-running task (slow CPU burst)
+void slowTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("SLOW: ");
+        printHex(counter++);
+        print("\n");
+
+        // Larger delay — simulates longer burst
+        for (volatile int i = 0; i < 1500000; i++);
+    }
+}
+
+// Optional third task (medium CPU burst)
+void mediumTask() {
+    uint32_t counter = 0;
+    while (1) {
+        print("MEDIUM: ");
+        printHex(counter++);
+        print("\n");
+
+        for (volatile int i = 0; i < 800000; i++);
+    }
+}
+
+/*
+ * ------------------------------
+ * Kernel Constructors / Setup
+ * ------------------------------
+ */
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
 extern "C" constructor end_ctors;
 
-extern "C" void callConstructors(){
-    for(constructor* i = &start_ctors; i != &end_ctors; i++){
+extern "C" void callConstructors() {
+    for (constructor* i = &start_ctors; i != &end_ctors; i++) {
         (*i)();
     }
 }
 
-typedef struct multiboot_info {
-    uint32_t flags;
-    uint32_t mem_lower;
-    uint32_t mem_upper;
-    uint32_t boot_device;
-    uint32_t cmdline;
-    uint32_t mods_count;
-    uint32_t mods_addr;
-    uint32_t syms[4];
-    uint32_t mmap_length;
-    uint32_t mmap_addr;
-} __attribute__((packed)) multiboot_info_t;
-
-
-typedef struct multiboot_mmap_entry {
-    uint32_t size;
-    uint64_t addr;
-    uint64_t len;
-    uint32_t type;
-} __attribute__((packed)) multiboot_mmap_entry_t;
-
-
-extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
+/*
+ * ------------------------------
+ * Kernel Main
+ * ------------------------------
+ */
+extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     if (magic != 0x2BADB002) {
         print("Invalid multiboot magic!\n");
         while (1);
     }
-    print("Starting MyOS Kernel...\n");
-    print("Hardware Initialization Stage 1\n");
-    init_gdt();
-    print("Hardware Initialization Stage 2\n");
 
-    InterruptManager interrupts;
-    DriverManager driverManager; 
+    // Initialize GDT (Global Descriptor Table)
+    init_gdt();
+
+    // Initialize task manager and add tasks
+    TaskManager taskManager;
+    Task t1(&fastTask, 3);    // short burst time
+    Task t2(&mediumTask, 6);  // medium burst
+    Task t3(&slowTask, 10);   // long burst
+
+    taskManager.addTask(&t1);
+    taskManager.addTask(&t2);
+    taskManager.addTask(&t3);
+
+    // Initialize interrupts and drivers
+    InterruptManager interrupts(&taskManager);
+    DriverManager driverManager;
 
     KeyboardDriver keyboard(&interrupts);
     MouseDriver mouse(&interrupts);
-
     driverManager.addDriver(&keyboard);
     driverManager.addDriver(&mouse);
-
     driverManager.activateAll();
-    interrupts.activate();
 
-    print("Hardware Initialization Stage 3\n");
     PeripheralComponentInterconnectController pciDevices;
-    pciDevices.selectDrivers(&driverManager, &interrupts);
+    // pciDevices.selectDrivers(&driverManager, &interrupts);
 
     VideoGraphicsArray vga;
+    // vga.SetMode(320,200,8); // optional if you want graphics mode
 
+    interrupts.activate(); // enable interrupts
 
-    print("Hardware Initialization Done...\n");
+    // Display memory info (optional)
+    meminfo(addr);
 
-    vga.SetMode(320,200,8);
-    vga.fillRectangle(0,0,320,200,0x00,0x00,0xA8);
-
-
-            
+    // Keep kernel running forever
     while (1);
 }

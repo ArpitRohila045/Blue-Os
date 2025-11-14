@@ -11,6 +11,7 @@ objects = obj/loader.o \
 		  obj/common/delete.o \
 		  obj/gdt_flush.o \
           obj/gdt.o \
+		  obj/multitasking.o \
           obj/drivers/driver.o \
           obj/hardwarecommunication/port.o \
           obj/hardwarecommunication/interruptstubs.o \
@@ -22,6 +23,7 @@ objects = obj/loader.o \
 		  obj/gui/widget.o \
 		  obj/gui/desktop.o \
 		  obj/gui/window.o \
+		  obj/memory/multiboot.o \
           obj/kernel.o
 
 
