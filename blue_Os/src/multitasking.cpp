@@ -26,8 +26,21 @@ Task::Task(void entrypoint(), uint32_t burst, uint32_t prio)
     cpustate->ebp = 0;
 
     cpustate->eip = (uint32_t)entrypoint;
-    cpustate->cs  = 0x08;
-    cpustate->eflags = 0x202;   // interrupts enabled
+
+    /*
+     * Code segment selector (CS) — defines which privilege level
+     * and memory segment this task runs in.
+     * For kernel-level multitasking, this usually points to SEG_KCODE.
+     */
+    cpustate->cs = 0x08;  // Kernel code segment selector
+
+    /*
+     * EFLAGS is set with bit 9 (the interrupt enable flag) = 1.
+     * 0x202 means:
+     *   Bit 1: always set
+     *   Bit 9: IF = 1 (interrupts enabled)
+     */
+    cpustate->eflags = 0x202;
 }
 
 Task::~Task() {}
@@ -167,4 +180,18 @@ CPUState* TaskManager::prioritySchedule(CPUState* cpustate) {
 
     currentTask = best;
     return tasks[currentTask]->cpustate;
+
+    // First-Come, First-Served (FCFS) Scheduling
+    // return fcfs(cpustate);
 }
+
+
+// CPUState* fcfs(CPUState* cpusate){
+
+// }
+
+// CPUState* srtf(CPUState* cpusate){
+
+// }
+
+
