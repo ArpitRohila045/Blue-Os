@@ -9,25 +9,14 @@
 #include <drivers/vga.h>
 #include <multitasking.h>
 #include <memory/multiboot.h>
-#include <memory/memorymanagment.h>
-#include <drivers/ata.h>
 
-using namespace std;
+
 using namespace blueOs;
 using namespace blueOs::hardwarecommunication;
 using namespace blueOs::drivers;
 using namespace blueOs::common;
-using namespace blueOs::memory;
 
-void taskA(){
-    while(1)
-        print("A");
-}
 
-void taskB(){
-    while(1)
-        print("B");
-}
 
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
@@ -61,39 +50,47 @@ MemoryManager setup_memory(multiboot_info* mbi) {
     return memoryManager;
 }
 
+typedef struct multiboot_info {
+    uint32_t flags;
+    uint32_t mem_lower;
+    uint32_t mem_upper;
+    uint32_t boot_device;
+    uint32_t cmdline;
+    uint32_t mods_count;
+    uint32_t mods_addr;
+    uint32_t syms[4];
+    uint32_t mmap_length;
+    uint32_t mmap_addr;
+} __attribute__((packed)) multiboot_info_t;
 
-extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
+
+typedef struct multiboot_mmap_entry {
+    uint32_t size;
+    uint64_t addr;
+    uint64_t len;
+    uint32_t type;
+} __attribute__((packed)) multiboot_mmap_entry_t;
+
+
+extern "C" void kernelMain(uint32_t magic, uint32_t addr) {
     if (magic != 0x2BADB002) {
         print("Invalid multiboot magic!\n");
         while (1);
     }
-
-    MemoryManager memoryManager = setup_memory(addr);
     // print("Starting MyOS Kernel...\n");
     // print("Hardware Initialization Stage 1\n");
     init_gdt();
     // print("Hardware Initialization Stage 2\n");
 
-    // int32_t* a = new int32_t[5];
-    // for (int i = 0 ; i < 5; i++){
-    //     a[i] = i;
-    // }
-
-    // for (int i = 0 ; i < 5; i++){
-    //     print_dec(a[i]);
-    //     print(" ");
-    // }
-
     TaskManager taskManager;
-
-    
+    /*
     Task task1(&taskA);
     Task task2(&taskB);
-    // taskManager.addTask(&task1);
-    // taskManager.addTask(&task2);
-    
+    taskManager.addTask(&task1);
+    taskManager.addTask(&task2);
+    */
 
-    InterruptManager interrupts(&taskManager);
+    InterruptManager interrupts;
     DriverManager driverManager; 
 
     KeyboardDriver keyboard(&interrupts);
@@ -103,10 +100,11 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     driverManager.addDriver(&mouse);
 
     driverManager.activateAll();
+    interrupts.activate();
 
-    // print("Hardware Initialization Stage 3\n");
+    print("Hardware Initialization Stage 3\n");
     PeripheralComponentInterconnectController pciDevices;
-    // pciDevices.selectDrivers(&driverManager, &interrupts);
+    pciDevices.selectDrivers(&driverManager);
 
     VideoGraphicsArray vga;
 
@@ -118,30 +116,10 @@ extern "C" void kernelMain(uint32_t magic, multiboot_info* addr) {
     //     for(uint32_t x=0; x<320; x++)
     //         vga.PutPixel(x,y,0x00,0x00,0xA8);
 
-    print("\nS-ATA primary master: ");
-    AdvanceTechnologyAttachment ata0m(true, 0x1F0);
-    ata0m.identify();
-    
-    print("\nS-ATA primary slave: ");
-    AdvanceTechnologyAttachment ata0s(false, 0x1F0);
-    ata0s.identify();
-    ata0s.write28(0, (uint8_t*)"http://www.AlgorithMan.de", 25);
-    ata0s.flush();
-    ata0s.read28(0, 25);
-    
-    print("\nS-ATA secondary master: ");
-    AdvanceTechnologyAttachment ata1m(true, 0x170);
-    ata1m.identify();
-    
-    print("\nS-ATA secondary slave: ");
-    AdvanceTechnologyAttachment ata1s(false, 0x170);
-    ata1s.identify();
-    // third: 0x1E8
-    // fourth: 0x168
 
         
     interrupts.activate();
 
-    // meminfo(addr);
+    meminfo(addr);
     while (1);
 }

@@ -2,12 +2,10 @@
 #define __BLUE_OS__MULTITASKING_H
 
 #include <common/types.h>
-#include <gdt.h>
 
+namespace blueOs {
 
-namespace blueOs{
-    struct CPUState
-    {
+    struct CPUState {
         blueOs::common::uint32_t eax;
         blueOs::common::uint32_t ebx;
         blueOs::common::uint32_t ecx;
@@ -17,32 +15,36 @@ namespace blueOs{
         blueOs::common::uint32_t edi;
         blueOs::common::uint32_t ebp;
 
-        /*
-        commmon::uint32_t gs;
-        commmon::uint32_t fs;
-        commmon::uint32_t es;
-        commmon::uint32_t ds;
-        */
-
         blueOs::common::uint32_t error;
 
         blueOs::common::uint32_t eip;
         blueOs::common::uint32_t cs;
         blueOs::common::uint32_t eflags;
         blueOs::common::uint32_t esp;
-        blueOs::common::uint32_t ss;        
+        blueOs::common::uint32_t ss;
     } __attribute__((packed));
 
-    class Task{
+
+    class Task {
         friend class TaskManager;
-        private:
-            blueOs::common::uint8_t stack[4096];
-            CPUState* cpustate;
-        public:
-            Task(void entrypoint());
-            ~Task();
+
+    private:
+        blueOs::common::uint8_t stack[4096];
+        CPUState* cpustate;
+
+    public:
+        blueOs::common::uint32_t burstTime;
+        blueOs::common::uint32_t remainingTime;
+        blueOs::common::uint32_t priority;
+
+        Task(void entrypoint(),
+             blueOs::common::uint32_t burst = 10,
+             blueOs::common::uint32_t prio = 1);
+
+        ~Task();
     };
 
+<<<<<<< HEAD
     class TaskManager{
         private:
             Task* tasks[256];
@@ -53,7 +55,30 @@ namespace blueOs{
             ~TaskManager();
             bool addTask(Task* task);
             CPUState* schedule(CPUState* cpustate); 
+=======
+
+    class TaskManager {
+    private:
+        Task* tasks[256];
+        int numTasks;
+        int currentTask;
+
+    public:
+        TaskManager();
+        ~TaskManager();
+
+        bool addTask(Task* task);
+
+        CPUState* schedule(CPUState* cpustate);
+
+        // additional scheduling methods:
+        CPUState* fcfs(CPUState* cpustate);
+        CPUState* sjf(CPUState* cpustate);
+        CPUState* srtf(CPUState* cpustate);
+        CPUState* prioritySchedule(CPUState* cpustate);
+>>>>>>> 552f472b642ea32ac4f5f49cf8a603e6f63b071c
     };
+
 }
 
 #endif

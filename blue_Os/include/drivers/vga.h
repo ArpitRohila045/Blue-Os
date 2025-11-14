@@ -1,5 +1,5 @@
-#ifndef _BLUE_OS_DRIVERS_VGA_H
-#define _BLUE_OS_DRIVERS_VGA_H
+#ifndef __BLUE_OS__DRIVERS__VGA_H
+#define __BLUE_OS__DRIVERS__VGA_H
 
 #include<common/types.h>
 #include<hardwarecommunication/port.h>
@@ -39,6 +39,7 @@ namespace blueOs{
             virtual void PutPixel(common::uint32_t x, common::uint32_t y, common::uint8_t r, common::uint8_t g, common::uint8_t b); //r,g,b colors to put on x and y co-ordinates 
             virtual void PutPixel(common::uint32_t x, common::uint32_t y, common::uint8_t colorIndex); //8 bit color mode uses 256 entries of diff colors and colorIndex-> will get certain colors for the x,y index
             
+            virtual void fillRectangle(common::uint32_t x, common::uint32_t y,common::uint32_t w, common::uint32_t h, common::uint8_t r, common::uint8_t g, common::uint8_t b);  
         };
     }
 }

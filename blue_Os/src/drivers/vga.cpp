@@ -179,4 +179,10 @@ VideoGraphicsArray::VideoGraphicsArray():
                 PutPixel(x, y, GetColorIndex(r, g, b)); // Map RGB → VGA index → write to screen
             }
 
+            void VideoGraphicsArray::fillRectangle(uint32_t x, uint32_t y, uint32_t w, uint32_t h,   uint8_t r, uint8_t g, uint8_t b){
+                for(int32_t Y = y; Y < y+h; Y++)
+                    for(int32_t X = x; X < x+w; X++)
+                        PutPixel(X, Y, r, g, b);
+            } 
+
 
