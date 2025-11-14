@@ -13,7 +13,9 @@ namespace blueOs{
         // --------- Abstraction for Handlers-----------
         class MouseEventHandler {
             public:
-                MouseEventHandler(MouseDriver*);
+                MouseEventHandler();
+                virtual ~MouseEventHandler();
+
                 virtual void onMouseUp(uint8_t);
                 virtual void onMouseDown(uint8_t);
                 virtual void onMouseMove(int, int);

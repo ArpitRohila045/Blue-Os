@@ -13,7 +13,7 @@ namespace blueOs{
         // --------- Abstraction for Handlers-----------
         class KeyboardEventHandler {
             public:
-                KeyboardEventHandler(KeyboardDriver*);
+                KeyboardEventHandler();
                 ~KeyboardEventHandler();
                 virtual void onKeyLeft(char);
                 virtual void onKeyRight(char);
@@ -25,10 +25,15 @@ namespace blueOs{
             private:
                 blueOs::hardwarecommunication::Port8Bit commandPort;
                 blueOs::hardwarecommunication::Port8Bit dataPort;
-                KeyboardEventHandler keyboardEventHandler;
+
+                KeyboardEventHandler* handler;
+
             public :
                 KeyboardDriver(blueOs::hardwarecommunication::InterruptManager* interruptManager);
                 ~KeyboardDriver();
+
+                void setEventHandler(KeyboardEventHandler* h);
+
                 virtual uint32_t handleInterrupt(uint32_t esp);
                 virtual void activate();
         };
